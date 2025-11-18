@@ -1,12 +1,12 @@
 'use client';
 
 import { signIn, useSession } from 'next-auth/react';
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-export default function AdminLogin() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -42,7 +42,6 @@ export default function AdminLogin() {
       }
 
       if (result?.ok) {
-        // Redirect al panel admin
         const callbackUrl = searchParams.get('callbackUrl') || '/admin';
         router.push(callbackUrl);
         router.refresh();
@@ -163,5 +162,17 @@ export default function AdminLogin() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-calo-navy via-calo-darkgray to-calo-brown flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
