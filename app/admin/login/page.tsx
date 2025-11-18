@@ -43,8 +43,7 @@ function LoginForm() {
 
       if (result?.ok) {
         const callbackUrl = searchParams.get('callbackUrl') || '/admin';
-        router.push(callbackUrl);
-        router.refresh();
+        window.location.href = callbackUrl;
       }
     } catch (error) {
       setError('Error al iniciar sesión');
