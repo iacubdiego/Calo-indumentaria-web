@@ -24,6 +24,7 @@ interface Category {
 export default function Products() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0 });  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [activeCategory, setActiveCategory] = useState('uniformes');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
