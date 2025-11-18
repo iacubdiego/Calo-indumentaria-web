@@ -31,22 +31,18 @@ export default function ProductsManager() {
     }
   }, [status, router]);
 
-  // Cargar productos (esto después se conectará con el JSON)
+  // Cargar productos desde la API
   useEffect(() => {
-    // Mock data - después esto se cargará desde el JSON
-    const mockProducts: Product[] = [
-      {
-        id: 1,
-        name: 'Pantalón Cargo Reforzado',
-        images: ['/images/products/pantalon_clasico_marino_frente.jpg'],
-        description: 'Con bolsillos de carga y rodilleras reforzadas',
-        detailedDescription: 'Pantalón de trabajo confeccionado en tela grafa...',
-        features: ['Tela Grafa 100%', '6 bolsillos', 'Rodilleras reforzadas'],
-        category: 'uniformes'
-      },
-      // Más productos...
-    ];
-    setProducts(mockProducts);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        setProducts(data.products || []);
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      }
+    };
+    fetchProducts();
   }, []);
 
   if (status === 'loading') {
@@ -81,28 +77,58 @@ export default function ProductsManager() {
     setShowModal(true);
   };
 
-  const handleDeleteProduct = (productId: number) => {
+  const handleDeleteProduct = async (productId: number) => {
     if (confirm('¿Estás seguro de eliminar este producto?')) {
-      setProducts(products.filter(p => p.id !== productId));
-      // Aquí se guardaría en el JSON
+      const updatedProducts = products.filter(p => p.id !== productId);
+
+      try {
+        const response = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ products: updatedProducts })
+        });
+
+        if (response.ok) {
+          setProducts(updatedProducts);
+        } else {
+          alert('Error al eliminar el producto');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar el producto');
+      }
     }
   };
 
-  const handleSaveProduct = () => {
+  const handleSaveProduct = async () => {
     if (!selectedProduct) return;
-
+  
+    let updatedProducts;
     if (products.find(p => p.id === selectedProduct.id)) {
-      // Actualizar existente
-      setProducts(products.map(p => p.id === selectedProduct.id ? selectedProduct : p));
+      updatedProducts = products.map(p => p.id === selectedProduct.id ? selectedProduct : p);
     } else {
-      // Agregar nuevo
-      setProducts([...products, selectedProduct]);
+      updatedProducts = [...products, selectedProduct];
     }
-
-    setShowModal(false);
-    setSelectedProduct(null);
-    setIsEditing(false);
-    // Aquí se guardaría en el JSON
+  
+    try {
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: updatedProducts })
+      });
+    
+      if (response.ok) {
+        setProducts(updatedProducts);
+        setShowModal(false);
+        setSelectedProduct(null);
+        setIsEditing(false);
+      } else {
+        alert('Error al guardar el producto');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al guardar el producto');
+    }
   };
 
   const filteredProducts = filterCategory === 'all' 

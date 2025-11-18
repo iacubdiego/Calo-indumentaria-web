@@ -4,17 +4,33 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [productCount, setProductCount] = useState(0);
+  const [categoryCount, setCategoryCount] = useState(0);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin/login');
     }
   }, [status, router]);
+
+  useEffect(() => {
+    const fetchProductCount = async () => {
+      try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        setProductCount(data.products?.length || 0);
+        setCategoryCount(data.categories?.length || 0);
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      }
+    };
+    fetchProductCount();
+  }, []);
 
   if (status === 'loading') {
     return (
