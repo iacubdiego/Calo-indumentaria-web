@@ -101,48 +101,47 @@ export default function AdminDashboard() {
               Gestiona los productos de CALO desde este panel de control
             </p>
           </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-semibold mb-1">Total Productos</p>
-                  <p className="text-3xl font-bold text-calo-darkgray">12</p>
-                </div>
-                <div className="text-5xl">📦</div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-semibold mb-1">Categorías</p>
-                  <p className="text-3xl font-bold text-calo-darkgray">3</p>
-                </div>
-                <div className="text-5xl">🏷️</div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-semibold mb-1">Última Actualización</p>
-                  <p className="text-lg font-bold text-calo-darkgray">Hoy</p>
-                </div>
-                <div className="text-5xl">📅</div>
-              </div>
-            </motion.div>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <motion.div
+          whileHover={{ y: -5 }}
+          className="bg-white rounded-xl shadow-md p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm font-semibold mb-1">Total Productos</p>
+              <p className="text-3xl font-bold text-calo-darkgray">{productCount}</p>
+            </div>
+            <div className="text-5xl">📦</div>
           </div>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ y: -5 }}
+          className="bg-white rounded-xl shadow-md p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm font-semibold mb-1">Categorías</p>
+              <p className="text-3xl font-bold text-calo-darkgray">{categoryCount}</p>
+            </div>
+            <div className="text-5xl">🏷️</div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ y: -5 }}
+          className="bg-white rounded-xl shadow-md p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm font-semibold mb-1">Última Actualización</p>
+              <p className="text-lg font-bold text-calo-darkgray">Hoy</p>
+            </div>
+            <div className="text-5xl">📅</div>
+          </div>
+        </motion.div>
+      </div>
 
           {/* Actions Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
