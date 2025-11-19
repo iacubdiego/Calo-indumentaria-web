@@ -10,6 +10,17 @@ cloudinary.config({
 
 export async function POST(request: NextRequest) {
   try {
+    // Verificar configuración de Cloudinary
+    if (!process.env.CLOUDINARY_CLOUD_NAME || 
+        !process.env.CLOUDINARY_API_KEY || 
+        !process.env.CLOUDINARY_API_SECRET) {
+      console.error('Missing Cloudinary environment variables');
+      return NextResponse.json(
+        { error: 'Cloudinary no está configurado. Verificá las variables de entorno.' },
+        { status: 500 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     
@@ -43,10 +54,24 @@ export async function POST(request: NextRequest) {
       public_id: result.public_id
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error uploading image:', error);
+    
+    // Mensaje específico según el tipo de error
+    let errorMessage = 'Error al subir la imagen';
+    
+    if (error.message?.includes('Invalid API Key')) {
+      errorMessage = 'API Key de Cloudinary inválida';
+    } else if (error.message?.includes('cloud_name')) {
+      errorMessage = 'Cloud Name de Cloudinary inválido';
+    } else if (error.message?.includes('api_secret')) {
+      errorMessage = 'API Secret de Cloudinary inválido';
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
     return NextResponse.json(
-      { error: 'Error al subir la imagen' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

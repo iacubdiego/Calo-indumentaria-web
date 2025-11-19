@@ -59,11 +59,17 @@ export default function ImageUploader({
           body: formData,
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-          throw new Error('Error al subir imagen');
+          console.error('Server error:', data);
+          throw new Error(data.error || 'Error al subir imagen');
         }
 
-        const data = await response.json();
+        if (!data.url) {
+          throw new Error('No se recibió URL de la imagen');
+        }
+
         newImages.push(data.url);
         
         setUploadProgress(((i + 1) / filesToUpload.length) * 100);
