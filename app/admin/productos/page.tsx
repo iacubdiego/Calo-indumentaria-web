@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import ImageUploader from '@/components/ImageUploader';
 
 interface Product {
   id: number;
@@ -102,6 +102,24 @@ export default function ProductsManager() {
 
   const handleSaveProduct = async () => {
     if (!selectedProduct) return;
+
+    // Validaciones
+    if (!selectedProduct.name.trim()) {
+      alert('El nombre del producto es obligatorio');
+      return;
+    }
+    if (!selectedProduct.description.trim()) {
+      alert('La descripción corta es obligatoria');
+      return;
+    }
+    if (!selectedProduct.detailedDescription.trim()) {
+      alert('La descripción detallada es obligatoria');
+      return;
+    }
+    if (selectedProduct.images.length === 0) {
+      alert('Agregá al menos una imagen del producto');
+      return;
+    }
   
     let updatedProducts;
     if (products.find(p => p.id === selectedProduct.id)) {
@@ -212,6 +230,11 @@ export default function ProductsManager() {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">
                       📦
+                    </div>
+                  )}
+                  {product.images.length > 1 && (
+                    <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold">
+                      {product.images.length} fotos
                     </div>
                   )}
                 </div>
@@ -393,24 +416,19 @@ export default function ProductsManager() {
                   </p>
                 </div>
 
-                {/* Imágenes */}
+                {/* Imágenes con Upload */}
                 <div>
                   <label className="block text-calo-darkgray font-semibold mb-2">
-                    Rutas de Imágenes
+                    Imágenes del Producto *
                   </label>
-                  <textarea
-                    value={selectedProduct.images.join('\n')}
-                    onChange={(e) => setSelectedProduct({
+                  <ImageUploader
+                    images={selectedProduct.images}
+                    onImagesChange={(images) => setSelectedProduct({
                       ...selectedProduct,
-                      images: e.target.value.split('\n').filter(img => img.trim())
+                      images
                     })}
-                    rows={3}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calo-orange resize-none"
-                    placeholder="/images/products/producto-1.jpg&#10;/images/products/producto-2.jpg"
+                    maxImages={5}
                   />
-                  <p className="text-sm text-gray-600 mt-1">
-                    Las imágenes deben estar en /public/images/products/
-                  </p>
                 </div>
 
                 {/* Botones */}
