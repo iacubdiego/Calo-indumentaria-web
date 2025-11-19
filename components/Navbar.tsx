@@ -50,7 +50,7 @@ export default function Navbar() {
         </motion.div>
 
         <div className="hidden md:flex space-x-8">
-          {['Inicio', 'Productos', 'Nosotros', 'Contacto'].map((item) => (
+          {['Inicio', 'Productos', 'Nosotros'].map((item) => (
             <motion.button
               key={item}
               whileHover={{ scale: 1.1 }}
