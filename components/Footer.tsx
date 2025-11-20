@@ -18,7 +18,6 @@ export default function Footer() {
                 alt="CALO Logo"
                 width={180}
                 height={60}
-                className="brightness-0 invert"
               />
             </div>
             <p className="text-gray-400">
@@ -82,13 +81,13 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <span>📱</span>
-                <a href="https://wa.me/5491112345678" className="hover:text-white transition-colors">
-                  +54 11 XXXX-XXXX
+                <a href="https://wa.me/5491147830776" className="hover:text-white transition-colors">
+                  +(54 11) 4783-0776
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <span>📍</span>
-                <span>Buenos Aires, Argentina</span>
+                <span>Buenos Aires, Argentina, Lisandro Delatorre 20 cp 1408</span>
               </li>
             </ul>
           </div>

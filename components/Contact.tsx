@@ -90,8 +90,7 @@ export default function Contact() {
                   <div className="text-3xl">📱</div>
                   <div>
                     <h4 className="text-white font-semibold mb-1">Teléfono / WhatsApp</h4>
-                    <p className="text-gray-300">+54 11 XXXX-XXXX</p>
-                    <p className="text-gray-300">+54 11 XXXX-XXXX</p>
+                    <p className="text-gray-300">+(54 11) 4783-0776</p>
                   </div>
                 </motion.div>
 
@@ -102,7 +101,7 @@ export default function Contact() {
                   <div className="text-3xl">📍</div>
                   <div>
                     <h4 className="text-white font-semibold mb-1">Ubicación</h4>
-                    <p className="text-gray-300">Buenos Aires, Argentina</p>
+                    <p className="text-gray-300">Buenos Aires, Argentina, Lisandro Delatorre 20 cp 1408</p>
                   </div>
                 </motion.div>
 
