@@ -144,7 +144,7 @@ export default function AdminDashboard() {
       </div>
 
           {/* Actions Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -160,6 +160,23 @@ export default function AdminDashboard() {
               </p>
               <div className="mt-4 text-calo-orange font-semibold">
                 Ir al catálogo →
+              </div>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/admin/categorias')}
+              className="bg-white rounded-xl shadow-md p-8 text-left hover:shadow-xl transition-shadow"
+            >
+              <div className="text-5xl mb-4">🏷️</div>
+              <h3 className="text-2xl font-bold text-calo-darkgray mb-2">
+                Gestionar Categorías
+              </h3>
+              <p className="text-gray-600">
+                Crear, editar o eliminar categorías de productos
+              </p>
+              <div className="mt-4 text-calo-orange font-semibold">
+                Ver categorías →
               </div>
             </motion.button>
 

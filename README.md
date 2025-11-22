@@ -1,85 +1,326 @@
-# 🏭 CALO - Landing Page
+# 🏭 CALO - Sistema Completo de Gestión
 
-Landing page profesional para CALO - Indumentaria Laboral y Elementos de Protección Personal.
+Landing page profesional con **panel de administración completo** para CALO - Indumentaria Laboral y Elementos de Protección Personal.
 
-## 🚀 Características
+## 🆕 Nuevo: Sistema de Gestión de Categorías
 
+El panel de administración ahora incluye gestión completa de categorías de productos:
+
+- ✅ Crear, editar y eliminar categorías
+- ✅ Validación de integridad (no se pueden eliminar categorías con productos)
+- ✅ Interfaz visual con emojis
+- ✅ Integración automática con productos
+- ✅ Todo almacenado en MongoDB
+
+---
+
+## 🚀 Características Completas
+
+### Frontend (Sitio Web)
 - ✨ Animaciones fluidas con Framer Motion
 - 📱 Diseño 100% responsive
 - 🎨 Paleta de colores personalizada de la marca CALO
 - 🎬 Hero con video de fondo
 - 🧵 Texturas de tela integradas en el diseño
-- 📦 3 categorías de productos fáciles de editar
+- 📦 Categorías dinámicas de productos con modal de detalles
+- 🖼️ Carrusel de imágenes en modales
 - 📧 Formulario de contacto funcional
-- ⚡ Next.js 14 con App Router
-- 🎯 TypeScript para mayor seguridad
+- 💬 Integración con WhatsApp
+
+### Backend / Sistema de Administración
+- 🔐 Sistema de autenticación seguro con NextAuth.js
+- 👤 Panel de administración profesional
+- 🏷️ **NUEVO: CRUD completo de categorías**
+- ➕ CRUD completo de productos
+- 🖼️ Upload de imágenes con Cloudinary
+- 📊 Dashboard con estadísticas
+- 🔒 Rutas protegidas con middleware
+- 💾 Base de datos MongoDB Atlas
+
+---
 
 ## 📋 Requisitos Previos
 
 - Node.js 18+ instalado
 - npm o yarn
+- Cuenta de MongoDB Atlas (gratuita)
+- Cuenta de Cloudinary (gratuita, opcional)
 
-## 🛠️ Instalación
+---
 
-1. Instala las dependencias:
+## 🛠️ Instalación Completa
+
+### 1. Clonar e instalar dependencias
+
 ```bash
+# Instalar todas las dependencias
 npm install
 ```
 
-2. Ejecuta el servidor de desarrollo:
+### 2. Configurar MongoDB
+
+```bash
+# Crear archivo .env.local
+cp .env.local.example .env.local
+```
+
+Editar `.env.local` y agregar tu URI de MongoDB:
+```env
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/calo?retryWrites=true&w=majority
+```
+
+### 3. Inicializar la base de datos
+
+```bash
+# Cargar datos iniciales (categorías y productos de ejemplo)
+npm run seed
+```
+
+### 4. Configurar autenticación
+
+```bash
+# Generar hash de contraseña
+node scripts/generate-password-hash.js
+```
+
+Agregar las variables al `.env.local`:
+```env
+NEXTAUTH_SECRET=tu-secret-generado-con-openssl
+NEXTAUTH_URL=http://localhost:3000
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=el-hash-generado
+```
+
+### 5. (Opcional) Configurar Cloudinary
+
+Para subir imágenes desde el admin:
+```env
+CLOUDINARY_CLOUD_NAME=tu-cloud-name
+CLOUDINARY_API_KEY=123456789012345
+CLOUDINARY_API_SECRET=tu-api-secret
+```
+
+Ver `CLOUDINARY-SETUP.md` para más detalles.
+
+### 6. Ejecutar en desarrollo
+
 ```bash
 npm run dev
 ```
 
-3. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
+Accede a:
+- **Sitio web**: http://localhost:3000
+- **Admin login**: http://localhost:3000/admin/login
+- **Dashboard**: http://localhost:3000/admin
+- **Categorías**: http://localhost:3000/admin/categorias
+- **Productos**: http://localhost:3000/admin/productos
+
+---
+
+## 🎯 Guías de Uso
+
+### Para Administradores
+
+1. **Gestión de Categorías**: Ver `CATEGORIAS-SETUP.md`
+   - Crear y organizar categorías
+   - Editar nombres y descripciones
+   - Eliminar categorías vacías
+
+2. **Gestión de Productos**: Ver `README-ADMIN.md`
+   - Agregar productos con imágenes
+   - Asignar a categorías
+   - Editar y eliminar
+
+3. **Configuración Inicial**: Ver `ADMIN-SETUP.md`
+   - Cambiar contraseñas
+   - Configurar autenticación
+
+### Para Desarrolladores
+
+1. **Integración de Categorías**: Ver `INTEGRACION-CATEGORIAS.md`
+   - Snippets de código
+   - Cambios necesarios
+   - Testing
+
+2. **Upload de Imágenes**: Ver `CLOUDINARY-SETUP.md`
+   - Configurar Cloudinary
+   - API de upload
+
+3. **Deployment**: Ver `DEPLOYMENT.md`
+   - Deploy en Vercel
+   - Variables de entorno
+
+---
+
+## 📦 Estructura del Proyecto (Actualizada)
+
+```
+calo-landing/
+├── app/
+│   ├── admin/
+│   │   ├── categorias/        # 🆕 Gestión de categorías
+│   │   │   └── page.tsx
+│   │   ├── productos/          # Gestión de productos
+│   │   │   └── page.tsx
+│   │   ├── login/             # Login admin
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx         # Layout con AuthProvider
+│   │   └── page.tsx           # Dashboard admin
+│   ├── api/
+│   │   ├── auth/
+│   │   │   └── [...nextauth]/ # API de NextAuth
+│   │   │       └── route.ts
+│   │   ├── categories/        # 🆕 API de categorías
+│   │   │   └── route.ts
+│   │   ├── products/          # API de productos
+│   │   │   └── route.ts
+│   │   └── upload/            # API de upload imágenes
+│   │       └── route.ts
+│   ├── globals.css            # Estilos globales
+│   ├── layout.tsx             # Layout principal
+│   └── page.tsx               # Página home
+├── components/
+│   ├── AuthProvider.tsx       # Provider de NextAuth
+│   ├── ImageUploader.tsx      # Componente de carga imágenes
+│   ├── Navbar.tsx
+│   ├── Hero.tsx
+│   ├── About.tsx
+│   ├── Products.tsx           # Catálogo (usa categorías dinámicas)
+│   ├── Contact.tsx
+│   ├── Footer.tsx
+│   └── WhatsAppButton.tsx
+├── lib/
+│   ├── auth.ts                # Configuración de NextAuth
+│   └── mongodb.ts             # Cliente de MongoDB
+├── scripts/
+│   ├── generate-password-hash.js
+│   ├── seed-db.js             # 🆕 Seed con categorías
+│   └── verify-categories.js   # 🆕 Verificar instalación
+├── types/
+│   └── next-auth.d.ts
+├── public/
+│   ├── images/
+│   └── videos/
+├── middleware.ts              # Protección de rutas
+├── .env.local.example
+├── CATEGORIAS-SETUP.md        # 🆕 Guía de categorías
+├── INTEGRACION-CATEGORIAS.md  # 🆕 Guía de integración
+├── SNIPPETS-CATEGORIAS.tsx    # 🆕 Snippets de código
+├── CLOUDINARY-SETUP.md
+├── ADMIN-SETUP.md
+├── DEPLOYMENT.md
+└── package.json
+
+🆕 = Archivos nuevos del sistema de categorías
+```
+
+---
+
+## 🔧 Scripts Disponibles
+
+```bash
+# Desarrollo
+npm run dev
+
+# Build de producción
+npm run build
+
+# Ejecutar build de producción
+npm run start
+
+# Linter
+npm run lint
+
+# Inicializar base de datos
+npm run seed
+
+# Verificar sistema de categorías
+node scripts/verify-categories.js
+```
+
+---
+
+## 🌐 Deployment en Vercel
+
+### Con CLI:
+
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+### Variables de Entorno en Vercel:
+
+Configurar en el dashboard de Vercel:
+- `MONGODB_URI`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL` (tu dominio de producción)
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD_HASH`
+- `CLOUDINARY_CLOUD_NAME` (opcional)
+- `CLOUDINARY_API_KEY` (opcional)
+- `CLOUDINARY_API_SECRET` (opcional)
+
+📖 **Ver guía completa**: `DEPLOYMENT.md`
+
+---
+
+## 🔍 Verificación de Instalación
+
+Ejecutar script de verificación:
+
+```bash
+node scripts/verify-categories.js
+```
+
+Este script verifica:
+- ✅ Conexión a MongoDB
+- ✅ Existencia de categorías
+- ✅ Integridad de datos
+- ✅ Archivos del sistema
+- ✅ Estadísticas
+
+---
+
+## 📝 Flujo de Trabajo Recomendado
+
+### Setup Inicial:
+
+```
+1. Instalar dependencias → npm install
+2. Configurar .env.local
+3. Seed base de datos → npm run seed
+4. Verificar instalación → node scripts/verify-categories.js
+5. Iniciar desarrollo → npm run dev
+```
+
+### Agregar Contenido:
+
+```
+1. Crear/verificar categorías → /admin/categorias
+2. Subir imágenes (Cloudinary o local)
+3. Crear productos → /admin/productos
+4. Verificar en sitio web → /
+```
+
+### Deploy:
+
+```
+1. Build local → npm run build
+2. Verificar que funciona → npm run start
+3. Deploy en Vercel → vercel --prod
+4. Configurar variables de entorno
+5. Verificar producción
+```
+
+---
 
 ## 🎨 Personalización
 
-### Cambiar Productos
+### Colores de la Marca
 
-Edita el archivo `/components/Products.tsx` y modifica el array `categories`:
-
-```typescript
-const categories = [
-  {
-    id: 'uniformes',
-    name: 'Uniformes Industriales',
-    description: 'Tu descripción',
-    products: [
-      { 
-        id: 1, 
-        name: 'Nombre del Producto', 
-        image: '/images/products/tu-imagen.jpg', 
-        description: 'Descripción' 
-      },
-      // Agrega más productos...
-    ]
-  },
-  // Agrega más categorías...
-];
-```
-
-### Agregar Video Hero
-
-1. Coloca tu video en `/public/videos/hero-video.mp4`
-2. El componente Hero lo detectará automáticamente
-
-### Agregar Imágenes de Productos
-
-1. Coloca las imágenes en `/public/images/products/`
-2. Actualiza las rutas en el archivo de productos
-
-### Cambiar Información de Contacto
-
-Edita `/components/Contact.tsx` para actualizar:
-- Email
-- Teléfonos
-- Dirección
-- Horarios
-
-### Cambiar Colores
-
-Los colores de la marca están en `/tailwind.config.ts`:
+Editar `tailwind.config.ts`:
 
 ```typescript
 colors: {
@@ -93,107 +334,121 @@ colors: {
 }
 ```
 
-## 🌐 Deployment en Vercel (Recomendado)
+### Categorías Iniciales
 
-1. Crea una cuenta en [Vercel](https://vercel.com)
+Editar `scripts/seed-db.js` y agregar tus categorías:
 
-2. Instala Vercel CLI:
-```bash
-npm i -g vercel
+```javascript
+const categories = [
+  {
+    id: 'tu-categoria',
+    name: 'Tu Categoría',
+    description: 'Descripción',
+    emoji: '🔧'
+  },
+  // ... más categorías
+];
 ```
 
-3. Deploy:
-```bash
-vercel
-```
+---
 
-4. Sigue las instrucciones y tu sitio estará online en minutos!
+## 🐛 Troubleshooting
 
-### Deploy Manual
-
-También puedes conectar tu repositorio de GitHub directamente en Vercel:
-
-1. Push tu código a GitHub
-2. Importa el proyecto en Vercel
-3. Deploy automático ✅
-
-## 📦 Estructura del Proyecto
-
-```
-calo-landing/
-├── app/
-│   ├── globals.css          # Estilos globales
-│   ├── layout.tsx            # Layout principal
-│   └── page.tsx              # Página home
-├── components/
-│   ├── Navbar.tsx            # Barra de navegación
-│   ├── Hero.tsx              # Sección hero con video
-│   ├── About.tsx             # Sección nosotros
-│   ├── Products.tsx          # Catálogo de productos
-│   ├── Contact.tsx           # Formulario de contacto
-│   └── Footer.tsx            # Pie de página
-├── public/
-│   ├── images/               # Logos y imágenes
-│   ├── videos/               # Video hero
-│   └── textures/             # Texturas de tela
-└── package.json
-```
-
-## 🔧 Scripts Disponibles
+### No puedo acceder al admin
 
 ```bash
-npm run dev      # Servidor de desarrollo
-npm run build    # Build para producción
-npm run start    # Ejecutar build de producción
-npm run lint     # Linter de código
+# Regenerar contraseña
+node scripts/generate-password-hash.js
+# Actualizar .env.local con el nuevo hash
+# Reiniciar servidor
 ```
 
-## 📝 Próximos Pasos
+### Categorías no aparecen
 
-### Mejoras Sugeridas:
-
-1. **Integrar CMS**: Agregar Sanity o Strapi para gestionar productos desde un panel
-2. **Email Service**: Conectar el formulario con EmailJS o SendGrid
-3. **Analytics**: Agregar Google Analytics o Vercel Analytics
-4. **SEO**: Optimizar meta tags y agregar sitemap
-5. **WhatsApp**: Botón flotante de WhatsApp
-6. **Catálogo PDF**: Generar catálogo descargable
-
-## 🎥 Agregar Video
-
-Para el video del hero, recomiendo:
-- Duración: 10-30 segundos en loop
-- Formato: MP4 (H.264)
-- Resolución: 1920x1080 (Full HD)
-- Peso: < 5MB (comprimido)
-
-Puedes usar videos de:
-- Filmación propia de tu fábrica/productos
-- Stock de [Pexels](https://www.pexels.com/es-es/videos/) o [Pixabay](https://pixabay.com/es/videos/)
-
-## 💡 Tips
-
-- Las animaciones se desactivan automáticamente en dispositivos con `prefers-reduced-motion`
-- El formulario está preparado para integrar con servicios de email
-- Todas las imágenes deben estar optimizadas (usa [TinyPNG](https://tinypng.com/))
-
-## 🐛 Solución de Problemas
-
-**Error al instalar dependencias:**
 ```bash
-rm -rf node_modules package-lock.json
+# Verificar MongoDB
+node scripts/verify-categories.js
+# Re-ejecutar seed
+npm run seed
+```
+
+### Productos huérfanos
+
+```bash
+# Verificar integridad
+node scripts/verify-categories.js
+# Reasignar desde /admin/productos
+```
+
+### Build falla
+
+```bash
+rm -rf node_modules package-lock.json .next
 npm install
+npm run build
 ```
 
-**Build falla:**
-```bash
-npm run build
-# Revisa los errores de TypeScript en la consola
-```
+---
+
+## 📊 Roadmap
+
+### v1.0 - ✅ Completado
+- [x] Landing page responsive
+- [x] Sistema de productos con modal
+- [x] Formulario de contacto
+- [x] WhatsApp integration
+- [x] Sistema de autenticación
+- [x] Panel de administración básico
+- [x] CRUD de productos
+- [x] CRUD de categorías
+- [x] Upload de imágenes
+
+### v1.1 - 🔄 En desarrollo
+- [ ] API de productos con cache
+- [ ] Sistema de búsqueda
+- [ ] Filtros avanzados
+
+### v2.0 - 📅 Planificado
+- [ ] Sistema de múltiples administradores
+- [ ] Analytics y estadísticas avanzadas
+- [ ] Generación automática de catálogo PDF
+- [ ] Email notifications
+- [ ] Sistema de inventario
+
+---
+
+## 🔒 Seguridad
+
+- ✅ Contraseñas hasheadas con bcrypt
+- ✅ JWT tokens para sesiones
+- ✅ Middleware de protección de rutas
+- ✅ Variables de entorno para credenciales
+- ✅ .gitignore configurado correctamente
+- ✅ Validación de integridad de datos
+
+**⚠️ IMPORTANTE**: 
+- Nunca subas `.env.local` a git
+- Usa contraseñas fuertes
+- En producción, configura todas las variables de entorno
+- Cambia el NEXTAUTH_SECRET en producción
+
+---
 
 ## 📧 Soporte
 
-Para consultas sobre el proyecto: [tu-email@ejemplo.com]
+### Documentación:
+- **Categorías**: `CATEGORIAS-SETUP.md`
+- **Integración**: `INTEGRACION-CATEGORIAS.md`
+- **Admin**: `ADMIN-SETUP.md`
+- **Deployment**: `DEPLOYMENT.md`
+- **Cloudinary**: `CLOUDINARY-SETUP.md`
+
+### Scripts de Ayuda:
+- Verificación: `node scripts/verify-categories.js`
+- Password: `node scripts/generate-password-hash.js`
+- Seed: `npm run seed`
+
+---
 
 ## 📄 Licencia
 
@@ -202,3 +457,31 @@ Este proyecto fue creado para CALO - Ropa de Trabajo.
 ---
 
 Hecho con ❤️ para equipar la Industria Nacional 🏭
+
+**Default login credentials** (recuerda cambiarlos):
+- Usuario: `admin`
+- Contraseña: La que configures en `.env.local`
+
+---
+
+## 🎉 ¡Empezar!
+
+```bash
+# 1. Instalar
+npm install
+
+# 2. Configurar
+cp .env.local.example .env.local
+# Editar .env.local con tus credenciales
+
+# 3. Inicializar
+npm run seed
+
+# 4. Verificar
+node scripts/verify-categories.js
+
+# 5. Ejecutar
+npm run dev
+```
+
+¡Ya estás listo para administrar CALO! 🚀

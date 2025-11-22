@@ -16,6 +16,14 @@ interface Product {
   category: string;
 }
 
+interface Category {
+  _id?: string;
+  id: string;
+  name: string;
+  description: string;
+  emoji?: string;
+}
+
 export default function ProductsManager() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -24,6 +32,7 @@ export default function ProductsManager() {
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -43,6 +52,20 @@ export default function ProductsManager() {
       }
     };
     fetchProducts();
+  }, []);
+
+  {/* Luego, cargar categorías */}
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        setAvailableCategories(data.categories || []);
+      } catch (error) {
+        console.error('Error cargando categorías:', error);
+      }
+    };
+    fetchCategories();
   }, []);
 
   if (status === 'loading') {
@@ -183,6 +206,16 @@ export default function ProductsManager() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Quick Navigation */}
+        <div className="bg-white rounded-xl shadow-md p-4 mb-6 flex gap-4">
+          <button
+            onClick={() => router.push('/admin/categorias')}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            <span>🏷️</span>
+            <span className="font-semibold text-calo-darkgray">Gestionar Categorías</span>
+          </button>
+        </div>
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <h3 className="font-bold text-calo-darkgray mb-4">Filtrar por categoría:</h3>
@@ -348,18 +381,21 @@ export default function ProductsManager() {
                   <label className="block text-calo-darkgray font-semibold mb-2">
                     Categoría *
                   </label>
-                  <select
-                    value={selectedProduct.category}
-                    onChange={(e) => setSelectedProduct({
-                      ...selectedProduct,
-                      category: e.target.value
-                    })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calo-orange"
-                  >
-                    <option value="uniformes">👔 Uniformes Industriales</option>
-                    <option value="calzado">👞 Calzado de Seguridad</option>
-                    <option value="epp">🦺 Elementos de Protección</option>
-                  </select>
+                <select
+                  value={selectedProduct.category}
+                  onChange={(e) => setSelectedProduct({
+                    ...selectedProduct,
+                    category: e.target.value
+                  })}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calo-orange"
+                >
+                  <option value="">Selecciona una categoría...</option>
+                  {availableCategories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.emoji || '📦'} {cat.name}
+                    </option>
+                  ))}
+                </select>
                 </div>
 
                 {/* Descripción corta */}
