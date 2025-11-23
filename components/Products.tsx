@@ -25,7 +25,7 @@ export default function Products() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [activeCategory, setActiveCategory] = useState('uniformes');
+  const [activeCategory, setActiveCategory] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -102,10 +102,11 @@ export default function Products() {
       className="py-20 bg-white denim-texture"
     >
       <div className="container mx-auto px-4">
+        {/* Título */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
           <h2 className="section-title">
@@ -116,19 +117,12 @@ export default function Products() {
           </p>
         </motion.div>
 
-        {/* Category Tabs - Always visible */}
-        <motion.div 
-          className="flex flex-wrap justify-center gap-4 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {categories.map((category, index) => (
+        {/* Category Tabs - siempre visibles */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          {categories.map((category) => (
             <motion.button
               key={category.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+              initial={false}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveCategory(category.id)}
@@ -141,104 +135,77 @@ export default function Products() {
               {category.name}
             </motion.button>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Category Description */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.3 }}
-            className="text-center mb-12"
-          >
-            <p className="text-xl text-calo-lightgray">
-              {activeCategoryData?.description}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+        {/* Category Description - transición CSS simple */}
+        <div className="text-center mb-12 min-h-[32px] transition-opacity duration-200">
+          <p className="text-xl text-calo-lightgray">
+            {activeCategoryData?.description}
+          </p>
+        </div>
 
-        {/* Products Grid */}
-        <AnimatePresence mode="wait">
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-            key={activeCategory}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1
-                }
-              },
-              exit: { opacity: 0 }
-            }}
-          >
-          {activeProducts.map((product) => (
-            <motion.div
+        {/* Products Grid - animación simple con CSS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {activeProducts.map((product, index) => (
+            <div
               key={product.id}
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, y: -10 }}
               onClick={() => handleProductClick(product)}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer"
+              style={{ animationDelay: `${index * 100}ms` }}
+              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-105 hover:-translate-y-2 animate-fade-in-up"
             >
-              <div className="relative h-64 bg-gray-200 overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-calo-beige to-calo-brown/20 flex items-center justify-center">
-                  {product.images && product.images[0] ? (
-                    <img 
-                      src={product.images[0]} 
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                  ) : null}
-                  <span className={`text-6xl ${product.images && product.images[0] ? 'hidden' : ''}`}>📦</span>
-                </div>
-                {product.images && product.images.length > 1 && (
-                  <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                    {product.images.length} fotos
+                <div className="relative h-64 bg-gray-200 overflow-hidden">
+                  <div className="w-full h-full bg-gradient-to-br from-calo-beige to-calo-brown/20 flex items-center justify-center">
+                    {product.images && product.images[0] ? (
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <span className={`text-6xl ${product.images && product.images[0] ? 'hidden' : ''}`}>📦</span>
                   </div>
-                )}
+                  {product.images && product.images.length > 1 && (
+                    <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                      {product.images.length} fotos
+                    </div>
+                  )}
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-calo-darkgray mb-2">
+                    {product.name}
+                  </h3>
+                  <p className="text-calo-lightgray mb-4">
+                    {product.description}
+                  </p>
+                  <p className="text-calo-orange font-semibold text-sm">
+                    Click para ver detalles →
+                  </p>
+                </div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-calo-darkgray mb-2">
-                  {product.name}
-                </h3>
-                <p className="text-calo-lightgray mb-4">
-                  {product.description}
-                </p>
-                <p className="text-calo-orange font-semibold text-sm">
-                  Click para ver detalles →
-                </p>
-              </div>
-            </motion.div>
-          ))}
-          </motion.div>
-        </AnimatePresence>
+            ))}
+        </div>
 
         {/* Empty State */}
         {activeProducts.length === 0 && (
-          <div className="text-center py-12">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
             <div className="text-6xl mb-4">📭</div>
             <p className="text-calo-lightgray">No hay productos en esta categoría</p>
-          </div>
+          </motion.div>
         )}
 
         {/* CTA */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className="text-center mt-16"
         >
           <p className="text-lg text-calo-darkgray mb-6">

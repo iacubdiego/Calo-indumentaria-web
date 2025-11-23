@@ -33,6 +33,7 @@ export default function ProductsManager() {
   const [showModal, setShowModal] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -40,38 +41,41 @@ export default function ProductsManager() {
     }
   }, [status, router]);
 
-  // Cargar productos desde la API
+  // Cargar productos y categorías en paralelo
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
+      setIsLoadingData(true);
       try {
-        const response = await fetch('/api/products');
-        const data = await response.json();
-        setProducts(data.products || []);
+        // Cargar productos y categorías al mismo tiempo
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          fetch('/api/products'),
+          fetch('/api/categories')
+        ]);
+
+        const productsData = await productsResponse.json();
+        const categoriesData = await categoriesResponse.json();
+
+        setProducts(productsData.products || []);
+        setAvailableCategories(categoriesData.categories || []);
       } catch (error) {
-        console.error('Error cargando productos:', error);
+        console.error('Error cargando datos:', error);
+      } finally {
+        setIsLoadingData(false);
       }
     };
-    fetchProducts();
-  }, []);
+    
+    if (status === 'authenticated') {
+      fetchData();
+    }
+  }, [status]);
 
-  {/* Luego, cargar categorías */}
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/categories');
-        const data = await response.json();
-        setAvailableCategories(data.categories || []);
-      } catch (error) {
-        console.error('Error cargando categorías:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  if (status === 'loading') {
+  if (status === 'loading' || isLoadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-calo-orange"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-calo-orange mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando datos...</p>
+        </div>
       </div>
     );
   }
@@ -81,6 +85,9 @@ export default function ProductsManager() {
   }
 
   const handleNewProduct = () => {
+    // Usar la primera categoría disponible como default
+    const defaultCategory = availableCategories.length > 0 ? availableCategories[0].id : '';
+    
     setSelectedProduct({
       id: Date.now(),
       name: '',
@@ -88,7 +95,7 @@ export default function ProductsManager() {
       description: '',
       detailedDescription: '',
       features: [],
-      category: 'uniformes'
+      category: defaultCategory
     });
     setIsEditing(true);
     setShowModal(true);
@@ -139,6 +146,10 @@ export default function ProductsManager() {
       alert('La descripción detallada es obligatoria');
       return;
     }
+    if (!selectedProduct.category) {
+      alert('Debes seleccionar una categoría');
+      return;
+    }
     if (selectedProduct.images.length === 0) {
       alert('Agregá al menos una imagen del producto');
       return;
@@ -175,6 +186,11 @@ export default function ProductsManager() {
   const filteredProducts = filterCategory === 'all' 
     ? products 
     : products.filter(p => p.category === filterCategory);
+
+  // Función helper para obtener info de categoría
+  const getCategoryInfo = (categoryId: string) => {
+    return availableCategories.find(cat => cat.id === categoryId);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -216,16 +232,25 @@ export default function ProductsManager() {
             <span className="font-semibold text-calo-darkgray">Gestionar Categorías</span>
           </button>
         </div>
-        {/* Filters */}
+
+        {/* Filters - CORREGIDO: Usar categorías dinámicas */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <h3 className="font-bold text-calo-darkgray mb-4">Filtrar por categoría:</h3>
           <div className="flex flex-wrap gap-3">
-            {[
-              { id: 'all', name: 'Todos', emoji: '📦' },
-              { id: 'uniformes', name: 'Uniformes', emoji: '👔' },
-              { id: 'calzado', name: 'Calzado', emoji: '👞' },
-              { id: 'epp', name: 'EPP', emoji: '🦺' },
-            ].map((cat) => (
+            {/* Botón "Todos" */}
+            <button
+              onClick={() => setFilterCategory('all')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                filterCategory === 'all'
+                  ? 'bg-calo-orange text-white shadow-lg'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              📦 Todos
+            </button>
+            
+            {/* Categorías dinámicas desde la API */}
+            {availableCategories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setFilterCategory(cat.id)}
@@ -235,79 +260,114 @@ export default function ProductsManager() {
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                {cat.emoji} {cat.name}
+                {cat.emoji || '📦'} {cat.name}
               </button>
             ))}
           </div>
+          
+          {/* Mostrar contador de productos */}
+          <div className="mt-4 text-sm text-gray-600">
+            Mostrando {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''}
+            {filterCategory !== 'all' && ` en ${getCategoryInfo(filterCategory)?.name || 'esta categoría'}`}
+          </div>
         </div>
+
+        {/* Alert si no hay categorías */}
+        {availableCategories.length === 0 && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">⚠️</span>
+              <div>
+                <p className="font-bold text-yellow-800">No hay categorías creadas</p>
+                <p className="text-yellow-700">
+                  Necesitas crear al menos una categoría antes de agregar productos.
+                  <button
+                    onClick={() => router.push('/admin/categorias')}
+                    className="ml-2 underline font-semibold"
+                  >
+                    Ir a Gestionar Categorías →
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
-            {filteredProducts.map((product) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                {/* Imagen */}
-                <div className="relative h-48 bg-gray-200">
-                  {product.images[0] ? (
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-6xl">
-                      📦
-                    </div>
-                  )}
-                  {product.images.length > 1 && (
-                    <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold">
-                      {product.images.length} fotos
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="p-4">
-                  <h3 className="font-bold text-lg text-calo-darkgray mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    {product.description}
-                  </p>
-
-                  {/* Category Badge */}
-                  <div className="mb-4">
-                    <span className="inline-block bg-calo-beige text-calo-darkgray text-xs px-3 py-1 rounded-full font-semibold">
-                      {product.category === 'uniformes' && '👔 Uniformes'}
-                      {product.category === 'calzado' && '👞 Calzado'}
-                      {product.category === 'epp' && '🦺 EPP'}
-                    </span>
+            {filteredProducts.map((product) => {
+              const categoryInfo = getCategoryInfo(product.category);
+              
+              return (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  {/* Imagen */}
+                  <div className="relative h-48 bg-gray-200">
+                    {product.images[0] ? (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-6xl">
+                        📦
+                      </div>
+                    )}
+                    {product.images.length > 1 && (
+                      <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold">
+                        {product.images.length} fotos
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold transition-colors"
-                    >
-                      ✏️ Editar
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-colors"
-                    >
-                      🗑️ Eliminar
-                    </button>
+                  {/* Info */}
+                  <div className="p-4">
+                    <h3 className="font-bold text-lg text-calo-darkgray mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {product.description}
+                    </p>
+
+                    {/* Category Badge - Mejorado */}
+                    <div className="mb-4">
+                      <span className="inline-block bg-calo-beige text-calo-darkgray text-xs px-3 py-1 rounded-full font-semibold">
+                        {categoryInfo ? (
+                          <>
+                            {categoryInfo.emoji || '📦'} {categoryInfo.name}
+                          </>
+                        ) : (
+                          <>❓ Categoría desconocida</>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold transition-colors"
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-colors"
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
 
@@ -318,9 +378,20 @@ export default function ProductsManager() {
             <h3 className="text-2xl font-bold text-gray-600 mb-2">
               No hay productos en esta categoría
             </h3>
-            <p className="text-gray-500">
-              Agrega un nuevo producto para comenzar
+            <p className="text-gray-500 mb-4">
+              {filterCategory === 'all' 
+                ? 'Agrega un nuevo producto para comenzar'
+                : `No hay productos en ${getCategoryInfo(filterCategory)?.name || 'esta categoría'}`
+              }
             </p>
+            {availableCategories.length > 0 && (
+              <button
+                onClick={handleNewProduct}
+                className="bg-calo-orange hover:bg-calo-orange/90 text-white px-6 py-3 rounded-lg font-semibold"
+              >
+                + Agregar Primer Producto
+              </button>
+            )}
           </div>
         )}
       </main>
@@ -342,7 +413,7 @@ export default function ProductsManager() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl my-8"
             >
-              <div className="sticky top-0 bg-calo-orange text-white p-6 rounded-t-2xl">
+              <div className="sticky top-0 bg-calo-orange text-white p-6 rounded-t-2xl z-10">
                 <div className="flex justify-between items-center">
                   <h2 className="text-2xl font-bold">
                     {isEditing && selectedProduct.name ? 'Editar Producto' : 'Nuevo Producto'}
@@ -376,26 +447,31 @@ export default function ProductsManager() {
                   />
                 </div>
 
-                {/* Categoría */}
+                {/* Categoría - MEJORADO */}
                 <div>
                   <label className="block text-calo-darkgray font-semibold mb-2">
                     Categoría *
                   </label>
-                <select
-                  value={selectedProduct.category}
-                  onChange={(e) => setSelectedProduct({
-                    ...selectedProduct,
-                    category: e.target.value
-                  })}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calo-orange"
-                >
-                  <option value="">Selecciona una categoría...</option>
-                  {availableCategories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.emoji || '📦'} {cat.name}
-                    </option>
-                  ))}
-                </select>
+                  <select
+                    value={selectedProduct.category}
+                    onChange={(e) => setSelectedProduct({
+                      ...selectedProduct,
+                      category: e.target.value
+                    })}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-calo-orange"
+                  >
+                    <option value="">Selecciona una categoría...</option>
+                    {availableCategories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.emoji || '📦'} {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  {availableCategories.length === 0 && (
+                    <p className="text-sm text-red-600 mt-1">
+                      ⚠️ No hay categorías disponibles. Crea una categoría primero.
+                    </p>
+                  )}
                 </div>
 
                 {/* Descripción corta */}
@@ -477,7 +553,12 @@ export default function ProductsManager() {
                   </button>
                   <button
                     onClick={handleSaveProduct}
-                    className="flex-1 bg-calo-orange hover:bg-calo-orange/90 text-white py-3 rounded-lg font-semibold transition-colors shadow-lg"
+                    disabled={availableCategories.length === 0}
+                    className={`flex-1 py-3 rounded-lg font-semibold transition-colors shadow-lg ${
+                      availableCategories.length === 0
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                        : 'bg-calo-orange hover:bg-calo-orange/90 text-white'
+                    }`}
                   >
                     💾 Guardar Producto
                   </button>
