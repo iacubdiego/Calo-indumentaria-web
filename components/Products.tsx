@@ -18,17 +18,22 @@ interface Category {
   id: string;
   name: string;
   description: string;
+  emoji?: string;
   products?: Product[];
 }
+
+// Cantidad de productos a mostrar en el preview
+const PREVIEW_COUNT = 4;
 
 export default function Products() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [activeCategory, setActiveCategory] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Track which categories are expanded (null = none, string = category id)
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   // Cargar productos desde la API
   useEffect(() => {
@@ -44,9 +49,6 @@ export default function Products() {
         }));
         
         setCategories(categoriesWithProducts);
-        if (categoriesWithProducts.length > 0) {
-          setActiveCategory(categoriesWithProducts[0].id);
-        }
         setIsLoading(false);
       } catch (error) {
         console.error('Error cargando productos:', error);
@@ -55,9 +57,6 @@ export default function Products() {
     };
     fetchProducts();
   }, []);
-
-  const activeProducts = categories.find(cat => cat.id === activeCategory)?.products || [];
-  const activeCategoryData = categories.find(cat => cat.id === activeCategory);
 
   const handleNextImage = () => {
     if (selectedProduct) {
@@ -85,6 +84,52 @@ export default function Products() {
     setCurrentImageIndex(0);
   };
 
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategory(prev => prev === categoryId ? null : categoryId);
+  };
+
+  // Componente de tarjeta de producto (reutilizable)
+  const ProductCard = ({ product, index }: { product: Product; index: number }) => (
+    <div
+      onClick={() => handleProductClick(product)}
+      style={{ animationDelay: `${index * 100}ms` }}
+      className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-105 hover:-translate-y-2 animate-fade-in-up"
+    >
+      <div className="relative h-64 bg-gray-200 overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-calo-beige to-calo-brown/20 flex items-center justify-center">
+          {product.images && product.images[0] ? (
+            <img 
+              src={product.images[0]} 
+              alt={product.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <span className={`text-6xl ${product.images && product.images[0] ? 'hidden' : ''}`}>📦</span>
+        </div>
+        {product.images && product.images.length > 1 && (
+          <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+            {product.images.length} fotos
+          </div>
+        )}
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-calo-darkgray mb-2">
+          {product.name}
+        </h3>
+        <p className="text-calo-lightgray mb-4 line-clamp-2">
+          {product.description}
+        </p>
+        <p className="text-calo-orange font-semibold text-sm">
+          Click para ver detalles →
+        </p>
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
       <section id="productos" className="py-20 bg-white denim-texture">
@@ -107,7 +152,7 @@ export default function Products() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <h2 className="section-title">
             Nuestros <span className="text-calo-orange">Productos</span>
@@ -117,87 +162,111 @@ export default function Products() {
           </p>
         </motion.div>
 
-        {/* Category Tabs - siempre visibles */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((category) => (
-            <motion.button
-              key={category.id}
-              initial={false}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setActiveCategory(category.id)}
-              className={`px-8 py-4 rounded-lg font-bold transition-all duration-300 ${
-                activeCategory === category.id
-                  ? 'bg-calo-orange text-white shadow-lg'
-                  : 'bg-gray-200 text-calo-darkgray hover:bg-gray-300'
-              }`}
-            >
-              {category.name}
-            </motion.button>
-          ))}
-        </div>
+        {/* Categorías con preview */}
+        <div className="space-y-16">
+          {categories.map((category) => {
+            const isExpanded = expandedCategory === category.id;
+            const products = category.products || [];
+            const hasMoreProducts = products.length > PREVIEW_COUNT;
+            const displayProducts = isExpanded ? products : products.slice(0, PREVIEW_COUNT);
 
-        {/* Category Description - transición CSS simple */}
-        <div className="text-center mb-12 min-h-[32px] transition-opacity duration-200">
-          <p className="text-xl text-calo-lightgray">
-            {activeCategoryData?.description}
-          </p>
-        </div>
-
-        {/* Products Grid - animación simple con CSS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {activeProducts.map((product, index) => (
-            <div
-              key={product.id}
-              onClick={() => handleProductClick(product)}
-              style={{ animationDelay: `${index * 100}ms` }}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-105 hover:-translate-y-2 animate-fade-in-up"
-            >
-                <div className="relative h-64 bg-gray-200 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-calo-beige to-calo-brown/20 flex items-center justify-center">
-                    {product.images && product.images[0] ? (
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <span className={`text-6xl ${product.images && product.images[0] ? 'hidden' : ''}`}>📦</span>
+            return (
+              <div key={category.id} className="relative">
+                {/* Header de categoría */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+                  <div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-calo-darkgray flex items-center gap-3">
+                      {category.name}
+                      <span className="text-sm font-normal text-calo-lightgray bg-gray-100 px-3 py-1 rounded-full">
+                        {products.length} producto{products.length !== 1 ? 's' : ''}
+                      </span>
+                    </h3>
+                    <p className="text-calo-lightgray mt-2 max-w-2xl">
+                      {category.description}
+                    </p>
                   </div>
-                  {product.images && product.images.length > 1 && (
-                    <div className="absolute top-2 right-2 bg-calo-orange text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                      {product.images.length} fotos
-                    </div>
+                  
+                  {/* Botón Ver todos / Ver menos */}
+                  {hasMoreProducts && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toggleCategory(category.id)}
+                      className={`px-6 py-3 rounded-lg font-bold transition-all duration-300 whitespace-nowrap ${
+                        isExpanded
+                          ? 'bg-calo-darkgray text-white'
+                          : 'bg-calo-orange text-white shadow-lg hover:shadow-xl'
+                      }`}
+                    >
+                      {isExpanded ? (
+                        <>
+                          <span className="mr-2">↑</span>
+                          Ver menos
+                        </>
+                      ) : (
+                        <>
+                          Ver todos ({products.length})
+                          <span className="ml-2">→</span>
+                        </>
+                      )}
+                    </motion.button>
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-calo-darkgray mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-calo-lightgray mb-4">
-                    {product.description}
-                  </p>
-                  <p className="text-calo-orange font-semibold text-sm">
-                    Click para ver detalles →
-                  </p>
-                </div>
+
+                {/* Grid de productos */}
+                {products.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <AnimatePresence mode="popLayout">
+                      {displayProducts.map((product, index) => (
+                        <motion.div
+                          key={product.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                          layout
+                        >
+                          <ProductCard product={product} index={index} />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-xl">
+                    <div className="text-5xl mb-3">📭</div>
+                    <p className="text-calo-lightgray">No hay productos en esta categoría</p>
+                  </div>
+                )}
+
+                {/* Indicador de más productos (solo en preview) */}
+                {!isExpanded && hasMoreProducts && (
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={() => toggleCategory(category.id)}
+                      className="text-calo-orange hover:text-calo-orange/80 font-semibold transition-colors inline-flex items-center gap-2"
+                    >
+                      <span>+{products.length - PREVIEW_COUNT} productos más</span>
+                      <span className="text-xl">→</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Separador entre categorías */}
+                <div className="mt-12 border-b border-gray-200" />
               </div>
-            ))}
+            );
+          })}
         </div>
 
-        {/* Empty State */}
-        {activeProducts.length === 0 && (
+        {/* Empty State global */}
+        {categories.length === 0 && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
             <div className="text-6xl mb-4">📭</div>
-            <p className="text-calo-lightgray">No hay productos en esta categoría</p>
+            <p className="text-calo-lightgray">No hay productos disponibles</p>
           </motion.div>
         )}
 
@@ -222,7 +291,7 @@ export default function Products() {
         </motion.div>
       </div>
 
-      {/* Modal */}
+      {/* Modal de Producto */}
       <AnimatePresence>
         {selectedProduct && (
           <motion.div
