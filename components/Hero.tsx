@@ -59,7 +59,7 @@ export default function Hero() {
             transition={{ duration: 1, delay: 0.4 }}
           >
             Indumentaria laboral y elementos de protección personal para equipar 
-            a los trabajadores que forjan la Industria Nacional
+            a los trabajadores que forjan nuestra industria nacional
           </motion.p>
 
           <motion.div
