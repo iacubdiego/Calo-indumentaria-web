@@ -75,19 +75,19 @@ export default function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li className="flex items-center gap-2">
                 <span>📧</span>
-                <a href="mailto:ventas@calo.com.ar" className="hover:text-white transition-colors">
-                  ventas@calo.com.ar
+                <a href="mailto:indumentariacalo@gmail.com" className="hover:text-white transition-colors">
+                  indumentariacalo@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <span>📱</span>
-                <a href="https://wa.me/5491147830776" className="hover:text-white transition-colors">
-                  +(54 11) 4783-0776
+                <a href="https://wa.me/5491156379430" className="hover:text-white transition-colors">
+                  +(54 11) 5637-9430
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <span>📍</span>
-                <span>Buenos Aires, Argentina, Lisandro Delatorre 20 cp 1408</span>
+                <span>Lisandro De La Torre 20 of 2 CP 1408 CABA</span>
               </li>
             </ul>
           </div>
