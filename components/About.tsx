@@ -133,8 +133,8 @@ export default function About() {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             En CALO nos especializamos en la fabricación y comercialización de indumentaria 
-            laboral y elementos de protección personal. Nos dirigimos a una amplia gama de 
-            clientes, desde PYMEs y mayoristas hasta particulares.
+            laboral y elementos de protección personal. Trabajamos con una amplia gama de 
+            clientes del sector de la contruscción, PYMEs, distribuidoras y emprendores particulares.
           </motion.p>
         </motion.div>
 
@@ -212,7 +212,7 @@ export default function About() {
               transition={{ delay: 0.8 }}
             >
               &ldquo;Ofrecemos productos de alta calidad que combinan precio y durabilidad, 
-              que permitan equipar a los trabajadores de cada sector donde se forja la Industria Nacional&rdquo;
+              que permitan equipar a los trabajadores de cada sector que conponen nuestra industria nacional&rdquo;
             </motion.p>
           </motion.div>
         </motion.div>
