@@ -6,9 +6,7 @@ import { useState } from 'react';
 export default function WhatsAppButton() {
   const [isHovered, setIsHovered] = useState(false);
   
-  // IMPORTANTE: Reemplazá este número con el tuyo (formato internacional sin +)
-  // Ejemplo: Para +54 9 11 1234-5678 usar: 5491112345678
-  const phoneNumber = '5491112345678'; // ← CAMBIAR ESTE NÚMERO
+  const phoneNumber = '5491156379430'; // ← CAMBIAR ESTE NÚMERO
   
   const defaultMessage = 'Hola! Me gustaría consultar sobre sus productos de indumentaria laboral.';
   
