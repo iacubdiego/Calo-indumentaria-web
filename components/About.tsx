@@ -134,7 +134,7 @@ export default function About() {
           >
             En CALO nos especializamos en la fabricación y comercialización de indumentaria 
             laboral y elementos de protección personal. Trabajamos con una amplia gama de 
-            clientes del sector de la contruscción, PYMEs, distribuidoras y emprendores particulares.
+            clientes del sector de la construcción, PYMEs, distribuidoras y emprendores particulares.
           </motion.p>
         </motion.div>
 
