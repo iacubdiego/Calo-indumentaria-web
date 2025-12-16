@@ -160,32 +160,6 @@ export default function Products() {
           ))}
         </motion.div>
 
-        {/* Descripción de la categoría activa */}
-        <AnimatePresence mode="wait">
-          {activeCategory && activeCategoryData && (
-            <motion.div
-              key={activeCategory}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="text-center mb-10"
-            >
-              <div className="inline-flex items-center gap-3 bg-calo-orange/10 px-6 py-3 rounded-full mb-4">
-                {activeCategoryData.emoji && (
-                  <span className="text-3xl">{activeCategoryData.emoji}</span>
-                )}
-                <h3 className="text-2xl font-bold text-calo-darkgray">
-                  {activeCategoryData.name}
-                </h3>
-              </div>
-              <p className="text-lg text-calo-lightgray max-w-2xl mx-auto">
-                {activeCategoryData.description}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Grid de Productos */}
         <AnimatePresence mode="wait">
           {activeCategory && (
