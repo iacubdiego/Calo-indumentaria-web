@@ -78,8 +78,7 @@ export default function Contact() {
                   <div className="text-3xl">📧</div>
                   <div>
                     <h4 className="text-white font-semibold mb-1">Email</h4>
-                    <p className="text-gray-300">ventas@calo.com.ar</p>
-                    <p className="text-gray-300">info@calo.com.ar</p>
+                    <p className="text-gray-300">indumentariacalo@gmail.com</p>
                   </div>
                 </motion.div>
 
@@ -90,7 +89,7 @@ export default function Contact() {
                   <div className="text-3xl">📱</div>
                   <div>
                     <h4 className="text-white font-semibold mb-1">Teléfono / WhatsApp</h4>
-                    <p className="text-gray-300">+(54 11) 4783-0776</p>
+                    <p className="text-gray-300">+(54 11) 5637-9430</p>
                   </div>
                 </motion.div>
 
@@ -101,7 +100,7 @@ export default function Contact() {
                   <div className="text-3xl">📍</div>
                   <div>
                     <h4 className="text-white font-semibold mb-1">Ubicación</h4>
-                    <p className="text-gray-300">Buenos Aires, Argentina, Lisandro Delatorre 20 cp 1408</p>
+                    <p className="text-gray-300">Lisandro De La Torre 20 of 2 CP 1408 CABA</p>
                   </div>
                 </motion.div>
 
